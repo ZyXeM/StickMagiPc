@@ -153,21 +153,25 @@ public class MapController extends Thread implements IMapController {
             try {
                 ByteArrayOutputStream bStream = new ByteArrayOutputStream();
                 ObjectOutput oo = new ObjectOutputStream(bStream);
+                System.out.println(packageBundle.getMsg().getId());
+                packageBundle.getMsg().setId(8);
                 oo.writeObject(packageBundle.getMsg());
                 oo.close();
                 byte[] serializedMessage = bStream.toByteArray();
+                System.out.println("Begin broad");
                 for (PlayerConnection p : this.playerList) {
+                    System.out.println("found player");
 //                    if(p.getAddress().equals(packageBundle.getAddress()))
 //                        continue;
-                    DatagramSocket datagramSocket = new DatagramSocket(null);
-                    datagramSocket.bind(p.getAddress());
-                    DatagramPacket packet = new DatagramPacket(serializedMessage, serializedMessage.length);
+                    DatagramSocket datagramSocket = new DatagramSocket();
+                    DatagramPacket packet = new DatagramPacket(serializedMessage, serializedMessage.length,p.getAddress().getAddress(),p.getAddress().getPort());
                     datagramSocket.send(packet);
+                    System.out.println("package Send:"+packageBundle.getMsg().getId());
                 }
 
 
             } catch (Exception e) {
-
+                System.out.println(e.toString());
             }
 
 

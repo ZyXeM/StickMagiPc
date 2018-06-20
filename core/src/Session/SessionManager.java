@@ -31,6 +31,8 @@ public class SessionManager implements ISessionManager {
 
         objectQueue = new ObjectQueue(getServerAdres());
         objectQueue.start();
+        Thread t = new Thread(new ClientListener(this));
+        t.start();
     }
 
     public ArrayList<InetSocketAddress> getServerAdres(){
