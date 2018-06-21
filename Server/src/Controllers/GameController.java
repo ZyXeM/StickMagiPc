@@ -8,37 +8,47 @@ import Server.PlayerConnection;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class GameController implements IGameController {
 
   private  ArrayList<IMapController> gameList;
   private ArrayList<PlayerConnection> playerList;
+  private Map<InetSocketAddress,IMapController> playerMap;
   private int numberOfMaxPlayers = 5;
 
     public GameController() {
         gameList = new ArrayList<>();
         playerList = new ArrayList<>();
+        playerMap = new HashMap<>();
     }
 
 
-
+    /**
+     * Handles the log in request if its a new address it wil try to join a game
+     * @param messagePackage
+     * @param address
+     */
     private void handleLogin(LoginMsg messagePackage, InetSocketAddress address) {
         if(!this.login(messagePackage.getAccount())){
             //Show error message /feedback
             return;
         }
+
+        //searches if you're logged in
         boolean loggedIn = false;
         for (PlayerConnection p : playerList){
             if(p.getAddress().equals(address)){
                 loggedIn = true;
             }
         }
+        //If you're not logged in it wil make a new playerconnection and find a match
         if(!loggedIn){
             PlayerConnection playerConnection = new PlayerConnection();
             playerConnection.setAddress(address);
             playerConnection.setAccount(messagePackage.getAccount());
-
             this.findMatch(playerConnection);
         }
     }
@@ -54,12 +64,15 @@ public class GameController implements IGameController {
             if(map.getPlayerList().size() <= numberOfMaxPlayers){
                 map.addPlayerConnection(playerConnection);
                 newGame = false;
+                this.playerMap.put(playerConnection.getAddress(), map);
             }
         }
         if(newGame){
             createGame(playerConnection);
         }
     }
+
+
 
     /**
      * creates game with the playerconnection
@@ -73,6 +86,7 @@ public class GameController implements IGameController {
         this.playerList.add(playerConnection);
         playerConnection.setGame(controller);
         this.gameList.add(controller);
+        this.playerMap.put(playerConnection.getAddress(),controller);
         Thread t = new Thread((MapController)controller);
         t.start();
 
@@ -115,14 +129,10 @@ public class GameController implements IGameController {
 
     private void qMessage(PackageBundle packet) {
         System.out.println("Qmessage");
-        for(PlayerConnection pl : this.playerList){
-            for (PlayerConnection p : pl.getGame().getPlayerList()){
-                if(pl.getAddress().equals(packet.getAddress())){
-                    System.out.println("FoundPlayer");
-                    pl.getGame().addPacketQ(packet);
-                }
-            }
-        }
+      IMapController object =  this.playerMap.get(packet.getAddress());
+      object.addPacketQ(packet);
+
+
 
     }
 }

@@ -8,8 +8,11 @@ import Logic.Messages.AddInteractableMsg;
 import Logic.Messages.UpdateLocationMsg;
 import Logic.Messages.UpdateRotationMsg;
 import Session.SessionManager;
-import java.awt.geom.Point2D;
-import java.util.*;
+
+import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class WorldMap implements IUpdateManager {
     private List<Player> players;
@@ -17,6 +20,7 @@ public class WorldMap implements IUpdateManager {
     private List<Spell> spellList;
     private IDrawManager drawManager;
     private ISessionManager iSessionManager;
+    private Player focusedPlayer;
 
     public WorldMap(IDrawManager drawManager) {
         this.drawManager = drawManager;
@@ -25,6 +29,14 @@ public class WorldMap implements IUpdateManager {
         inGameObjects = new ArrayList<>();
         spellList = new ArrayList<>();
         this.iSessionManager.login(new Account("mitch","mitch"));
+    }
+
+    public WorldMap() {
+
+        players = new ArrayList<>();
+        inGameObjects = new ArrayList<>();
+        spellList = new ArrayList<>();
+
     }
 
     /**
@@ -38,11 +50,11 @@ public class WorldMap implements IUpdateManager {
            player.update(deltaTime);
         }
 
-        Iterator<InGameObject> inGameObjectIterator = inGameObjects.iterator();
-        while(inGameObjectIterator.hasNext()){
-            InGameObject player = inGameObjectIterator.next();
-            player.update(deltaTime);
-        }
+//        Iterator<InGameObject> inGameObjectIterator = inGameObjects.iterator();
+//        while(inGameObjectIterator.hasNext()){
+//            InGameObject player = inGameObjectIterator.next();
+//            player.update(deltaTime);
+//        }
 
 
 
@@ -81,7 +93,22 @@ public class WorldMap implements IUpdateManager {
         return list;
     }
 
+    public void addInteractable(Interactable interactable){
+        interactable.setSessionManager(this.iSessionManager);
+        if(interactable instanceof  Spell){
+            this.spellList.add((Spell)interactable);
+        }else
 
+        if(interactable instanceof  Player){
+            this.players.add((Player)interactable);
+
+        }else
+        if(interactable instanceof  InGameObject){
+            this.inGameObjects.add((InGameObject)interactable);
+
+        }
+
+    }
 
 
 
@@ -90,12 +117,12 @@ public class WorldMap implements IUpdateManager {
      * @param deltaTime
      */
     public void render(float deltaTime){
-//        for (Player p: this.players){
-//            p.draw(this.drawManager);
-//        }
-//        for (InGameObject i : this.inGameObjects){
-//            i.draw(this.drawManager);
-//        }
+        for (Player p: this.players){
+            p.draw(this.drawManager);
+        }
+        for (InGameObject i : this.inGameObjects){
+            i.draw(this.drawManager);
+        }
     }
 
     public List<Spell> getSpellList() {
@@ -107,19 +134,8 @@ public class WorldMap implements IUpdateManager {
     }
 
     @Override
-    public void addInteractable(AddInteractableMsg interactableMsg) {
-        if(interactableMsg.getInteractable() instanceof  Spell){
-            this.spellList.add((Spell)interactableMsg.getInteractable());
-        }else
-
-        if(interactableMsg.getInteractable() instanceof  Player){
-            this.players.add((Player)interactableMsg.getInteractable());
-
-        }else
-        if(interactableMsg.getInteractable() instanceof  InGameObject){
-            this.inGameObjects.add((InGameObject)interactableMsg.getInteractable());
-
-        }
+    public void addInteractableUpdate(AddInteractableMsg interactableMsg) {
+            addInteractable(interactableMsg.getInteractable());
 
     }
 
@@ -144,9 +160,14 @@ public class WorldMap implements IUpdateManager {
     }
 
     public void walk(EDirection direction) {
-        System.out.println("Walk");
-        Player dummy = new Player();
-        dummy.setLocation(new Point2D.Float(1,1));
-        this.iSessionManager.sendLocation(dummy);
+        this.focusedPlayer.setWalkingDirection(direction);
+    }
+
+    public Player getFocusedPlayer() {
+        return focusedPlayer;
+    }
+
+    public void setFocusedPlayer(Player focusedPlayer) {
+        this.focusedPlayer = focusedPlayer;
     }
 }

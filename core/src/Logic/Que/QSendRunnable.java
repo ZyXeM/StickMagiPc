@@ -26,10 +26,15 @@ public class QSendRunnable extends Thread {
 
         while (true) {
             try {
+                this.sleep(200);
+            } catch (InterruptedException e1) {
+                e1.printStackTrace();
+            }
+            try {
                 Iterator<QObject> it = objectQ.iterator();
                 while (it.hasNext()) {
                     QObject object = it.next();
-                    Runnable run = () -> {
+
                         try {
                             ByteArrayOutputStream bStream = new ByteArrayOutputStream();
                             ObjectOutput oo = new ObjectOutputStream(bStream);
@@ -38,8 +43,8 @@ public class QSendRunnable extends Thread {
                             byte[] serializedMessage = bStream.toByteArray();
                             for (InetSocketAddress p : object.getPlayerList()) {
                                 DatagramSocket datagramSocket = new DatagramSocket(null);
-                                datagramSocket.bind(p);
-                                DatagramPacket packet = new DatagramPacket(serializedMessage, serializedMessage.length);
+                                //datagramSocket.bind(p);
+                                DatagramPacket packet = new DatagramPacket(serializedMessage, serializedMessage.length,p.getAddress(),p.getPort()+1);
                                 datagramSocket.send(packet);
                             }
 
@@ -49,10 +54,10 @@ public class QSendRunnable extends Thread {
                         }
 
 
-                    };
-                    e.submit(run);
+                    }
 
-                }
+
+
 
 
             } catch (Exception e) {

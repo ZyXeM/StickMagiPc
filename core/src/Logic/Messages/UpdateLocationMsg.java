@@ -1,17 +1,17 @@
 package Logic.Messages;
 
 
-import java.awt.geom.Point2D;
+import Logic.Model.Vector2D;
 
 public class UpdateLocationMsg extends MessagePackage {
-    private Point2D location;
+    private Vector2D location;
     private int interactableId;
 
-    public Point2D getLocation() {
+    public Vector2D getLocation() {
         return location;
     }
 
-    public void setLocation(Point2D location) {
+    public void setLocation(Vector2D location) {
         this.location = location;
     }
 

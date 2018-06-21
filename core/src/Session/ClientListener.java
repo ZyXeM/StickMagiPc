@@ -1,15 +1,8 @@
 package Session;
 
 import Logic.Messages.MessagePackage;
-import Logic.Que.PackageBundle;
-import Logic.Que.QObject;
-
 import java.io.*;
 import java.net.*;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class ClientListener extends Thread {
 
@@ -24,7 +17,7 @@ public class ClientListener extends Thread {
     public void run() {
         DatagramSocket datagramSocket = null;
         try {
-            datagramSocket = new DatagramSocket();
+            datagramSocket = new DatagramSocket(2001);
         } catch (SocketException e) {
             e.printStackTrace();
         }
@@ -36,7 +29,7 @@ public class ClientListener extends Thread {
 
                 InetAddress IPAddress = InetAddress.getByName("localhost");
 
-                DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length, IPAddress, 2000);
+                DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length, IPAddress, 2001);
                 System.out.println("Receiving from the server");
                 datagramSocket.receive(receivePacket);
                 System.out.println("Got Package form server");
@@ -49,7 +42,7 @@ public class ClientListener extends Thread {
 
 
             } catch (Exception e) {
-
+                System.out.println(e.toString());
             }
 
 

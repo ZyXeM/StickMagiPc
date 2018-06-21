@@ -10,7 +10,7 @@ import Logic.Model.Player;
 import Logic.Model.Spell;
 
 public interface IUpdateManager {
-   void addInteractable(AddInteractableMsg interactableMsg);
+   void addInteractableUpdate(AddInteractableMsg interactableMsg);
    void updateLocation(UpdateLocationMsg locationMsg);
    void updateRotation(UpdateRotationMsg rotationMsg);
 }

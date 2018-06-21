@@ -16,7 +16,6 @@ public class InputHandeler implements IInputHandeler {
 
     @Override
     public boolean walk(EDirection direction) {
-        System.out.println("WalkInput");
         worldMap.walk(direction);
         return true;
     }

@@ -32,7 +32,7 @@ public class MapController extends Thread implements IMapController {
 
 
     public MapController() {
-        worldMap = new WorldMap(null);
+        worldMap = new WorldMap();
         this.playerList = new ArrayList<>();
         this.playerListQueue = new ArrayList<>();
         ArrayList<InetSocketAddress> list = new ArrayList<>();
@@ -48,6 +48,7 @@ public class MapController extends Thread implements IMapController {
 
     public void updateLocation(PackageBundle packet) {
         System.out.println("LocationFromClient");
+        System.out.println( ((UpdateLocationMsg)  packet.getMsg()).getLocation().x);
         this.broadcastMessage(packet);
     }
 
@@ -161,10 +162,10 @@ public class MapController extends Thread implements IMapController {
                 System.out.println("Begin broad");
                 for (PlayerConnection p : this.playerList) {
                     System.out.println("found player");
-//                    if(p.getAddress().equals(packageBundle.getAddress()))
-//                        continue;
-                    DatagramSocket datagramSocket = new DatagramSocket();
-                    DatagramPacket packet = new DatagramPacket(serializedMessage, serializedMessage.length,p.getAddress().getAddress(),p.getAddress().getPort());
+                    if(p.getAddress().equals(packageBundle.getAddress()))
+                        continue;
+                    DatagramSocket datagramSocket = new DatagramSocket(null);
+                    DatagramPacket packet = new DatagramPacket(serializedMessage, serializedMessage.length,p.getAddress().getAddress(),p.getAddress().getPort()+1);
                     datagramSocket.send(packet);
                     System.out.println("package Send:"+packageBundle.getMsg().getId());
                 }

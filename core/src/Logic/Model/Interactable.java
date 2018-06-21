@@ -3,23 +3,25 @@ package Logic.Model;
 import Logic.Enummeration.EType;
 import Logic.Interface.IDrawManager;
 import Logic.Interface.ISessionManager;
-
-
 import java.awt.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public abstract class Interactable implements Serializable{
 
     private int ID;
-    private java.awt.geom.Point2D movement;
-    private java.awt.geom.Point2D location;
+    private Vector2D movement;
+    private List<Force> forces;
+    private Vector2D location;
     private int rotation;
     private int maxHealth;
     private int currentHealth;
     private List<Shape> hitBoxes;
     private WorldMap worldMap;
     private ISessionManager sessionManager;
+    private Vector2D zeroVector = new Vector2D(0,0);
 
 
 
@@ -30,16 +32,21 @@ public abstract class Interactable implements Serializable{
      * @param hitBoxes : collection of shapes which form the hit-box relative to the origin
      * @param worldMap : map as reference to interact with other interactables
      */
-    public Interactable(java.awt.geom.Point2D location, int rotation, int maxHealth, List<Shape> hitBoxes, WorldMap worldMap,ISessionManager sessionManager) {
+    public Interactable(Vector2D location, int rotation, int maxHealth, List<Shape> hitBoxes, WorldMap worldMap, ISessionManager sessionManager) {
         this.location = location;
         this.rotation = rotation;
+        this.rotation = 0;
         this.maxHealth = maxHealth;
         this.hitBoxes = hitBoxes;
         this.worldMap = worldMap;
         this.sessionManager = sessionManager;
+        this.hitBoxes  = new ArrayList<>();
+        this.forces = new ArrayList<>();
     }
 
     public Interactable() {
+        this.hitBoxes  = new ArrayList<>();
+        this.forces = new ArrayList<>();
 
     }
 
@@ -57,8 +64,8 @@ public abstract class Interactable implements Serializable{
      * applies a directional force to an object
      * @param force : direction and amplitude of the force
      */
-    public void addForce(java.awt.geom.Point2D force){
-       // this.movement.plus(force);
+    public void addForce(Vector2D force){
+        this.movement.add(force);
     }
     public abstract void draw(IDrawManager iDrawManager);
 
@@ -67,13 +74,26 @@ public abstract class Interactable implements Serializable{
      * applies the current forces
      */
     public void applyPhysics(float deltaTime){
+        movement = zeroVector.clone();
+        Iterator<Force> it = this.forces.iterator();
+        while(it.hasNext()){
+            Force force = it.next();
+            if(force.getForce().equals(zeroVector) && !force.isPermanent()){
+                it.remove();
+            }
+            else{
+                if(!force.getForce().equals(zeroVector)){
+                     movement.add(force.getForce());
+                }
+            }
 
-        checkCollide();
+        }
 
+        if(!movement.equals(zeroVector)){
 
-     //   this.location.translate(this.movement.x(),this.movement.y());
-        this.sessionManager.sendLocation(this);
-        this.sessionManager.sendRotation(this);
+        this.location.add(this.movement.x,this.movement.y);
+        sessionManager.sendLocation(this);
+        }
     }
 
     /**
@@ -98,13 +118,13 @@ public abstract class Interactable implements Serializable{
      * @return true if the objects collide
      */
     public  boolean isColliding(Interactable interactable){
-//        for (Shape2D shape:this.hitBoxes){
-//            for (Shape2D shape2:interactable.hitBoxes){
-//                if(shape.boundingBox().containsBounds(shape2)){
-//                    this.collide(interactable);
-//                }
-//            }
-//        }
+        for (Shape shape:this.hitBoxes){
+            for (Shape shape2:interactable.hitBoxes){
+                if(shape.contains(shape2.getBounds2D())){
+                    this.collide(interactable);
+                }
+            }
+        }
            return false;
     }
 
@@ -124,23 +144,24 @@ public abstract class Interactable implements Serializable{
     public void collide(Interactable interactable){
 
 
+
     }
 
 
-    public java.awt.geom.Point2D getLocation() {
+    public Vector2D getLocation() {
         return location;
     }
 
-    public void setLocation(java.awt.geom.Point2D location) {
+    public void setLocation(Vector2D location) {
         this.location = location;
 
     }
 
-    public java.awt.geom.Point2D getMovement() {
+    public Vector2D getMovement() {
         return movement;
     }
 
-    public void setMovement(java.awt.geom.Point2D movement) {
+    public void setMovement(Vector2D movement) {
         this.movement = movement;
     }
 
@@ -186,5 +207,32 @@ public abstract class Interactable implements Serializable{
         this.ID = ID;
     }
 
+    public void changeRotation(int rotate){
+       int newRotation = (this.rotation + rotate);
+        if(newRotation >= 360){
+            setRotation(0+(newRotation-360));
 
+        }else
+        if(newRotation < 0){
+            setRotation(360 + newRotation);
+        }else
+            this.setRotation(newRotation);
+    }
+
+
+    public ISessionManager getSessionManager() {
+        return sessionManager;
+    }
+
+    public void setSessionManager(ISessionManager sessionManager) {
+        this.sessionManager = sessionManager;
+    }
+
+    public List<Force> getForces() {
+        return forces;
+    }
+
+    public void setForces(List<Force> forces) {
+        this.forces = forces;
+    }
 }

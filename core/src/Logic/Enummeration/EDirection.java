@@ -1,5 +1,5 @@
 package Logic.Enummeration;
 
 public enum EDirection {
-    LEFT,RIGHT,UP,DOWN
+    LEFT,RIGHT,UP,DOWN,NONE
 }

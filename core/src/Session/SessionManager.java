@@ -11,7 +11,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.net.*;
-import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -21,6 +20,7 @@ public class SessionManager implements ISessionManager {
     transient ExecutorService e;
     ObjectQueue objectQueue;
     private WorldMap worldMap;
+    Thread listener;
 
 
 
@@ -31,8 +31,8 @@ public class SessionManager implements ISessionManager {
 
         objectQueue = new ObjectQueue(getServerAdres());
         objectQueue.start();
-        Thread t = new Thread(new ClientListener(this));
-        t.start();
+        listener = new Thread(new ClientListener(this));
+        listener.start();
     }
 
     public ArrayList<InetSocketAddress> getServerAdres(){
@@ -88,7 +88,7 @@ public class SessionManager implements ISessionManager {
             this.objectQueue.confirmQUpdate(new PackageBundle(getServerAdres().get(0),messagePackage));
         }
         if(messagePackage instanceof AddInteractableMsg){
-           this.worldMap.addInteractable((AddInteractableMsg)messagePackage);
+           this.worldMap.addInteractableUpdate((AddInteractableMsg)messagePackage);
         }else
         if(messagePackage instanceof UpdateLocationMsg){
            worldMap.updateLocation((UpdateLocationMsg) messagePackage);

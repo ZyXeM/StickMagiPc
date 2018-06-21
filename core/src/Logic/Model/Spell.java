@@ -6,7 +6,6 @@ import Logic.Interface.IDrawManager;
 import Logic.Interface.ISessionManager;
 import Logic.Interface.IUseable;
 import java.awt.*;
-import java.awt.geom.Point2D;
 import java.util.List;
 
 
@@ -21,7 +20,7 @@ public class Spell extends Interactable implements IUseable {
      * @param maxHealth : initial health of the interactable
      * @param hitBoxes  : collection of shapes which form the hit-box relative to the origin
      */
-    public Spell(Point2D location, int rotation, int maxHealth, List<Shape> hitBoxes, WorldMap worldMap, ISessionManager iSessionManager) {
+    public Spell(Vector2D location, int rotation, int maxHealth, List<Shape> hitBoxes, WorldMap worldMap, ISessionManager iSessionManager) {
         super(location, rotation, maxHealth, hitBoxes, worldMap,iSessionManager);
     }
 
