@@ -141,8 +141,11 @@ public class WorldMap implements IUpdateManager {
 
     @Override
     public void updateLocation(UpdateLocationMsg locationMsg) {
+
         for(Interactable i : this.getInteractables()){
+            System.out.println("UpdateFor");
             if(i.getID() == locationMsg.getInteractableId()){
+                System.out.println("Update");
                 i.setLocation(locationMsg.getLocation());
             }
         }

@@ -30,9 +30,7 @@ public class ClientListener extends Thread {
                 InetAddress IPAddress = InetAddress.getByName("localhost");
 
                 DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length, IPAddress, 2001);
-                System.out.println("Receiving from the server");
                 datagramSocket.receive(receivePacket);
-                System.out.println("Got Package form server");
                 ObjectInputStream iStream = new ObjectInputStream(new ByteArrayInputStream(receiveData));
 
                 MessagePackage msg = (MessagePackage) iStream.readObject();

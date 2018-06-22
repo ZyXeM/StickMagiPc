@@ -42,7 +42,7 @@ public class SessionManager implements ISessionManager {
         } catch (UnknownHostException e1) {
             e1.printStackTrace();
         }
-        InetSocketAddress inetSocketAddress = new InetSocketAddress(IPAddress,2000);
+        InetSocketAddress inetSocketAddress = new InetSocketAddress("192.168.2.11",2000);
         ArrayList<InetSocketAddress> list = new ArrayList<>();
         list.add(inetSocketAddress);
         return list;
@@ -65,7 +65,7 @@ public class SessionManager implements ISessionManager {
         UpdateLocationMsg locationMsg = new UpdateLocationMsg();
         locationMsg.setLocation(location.getLocation());
         locationMsg.setId(3);
-        locationMsg.setInteractableId(3);
+        locationMsg.setInteractableId(location.getID());
 
         broadcastToServer(locationMsg);
 
@@ -128,7 +128,8 @@ public class SessionManager implements ISessionManager {
                 byte[] serializedMessage = bStream.toByteArray();
                 DatagramSocket datagramSocket = new DatagramSocket();
                 InetAddress IPAddress = InetAddress.getByName("localhost");
-                DatagramPacket packet = new DatagramPacket(serializedMessage, serializedMessage.length, IPAddress, 2000);
+
+                DatagramPacket packet = new DatagramPacket(serializedMessage, serializedMessage.length,getServerAdres().get(0).getAddress() , 2000);
                 System.out.println("PackageSendClient");
                 datagramSocket.send(packet);
                 System.out.println("PackageSendClient");
