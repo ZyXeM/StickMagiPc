@@ -90,6 +90,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		}
 		else{
 			if(yourPlayer.getWalkingDirection() != EDirection.NONE)
+
 		   	 this.iInputHandeler.walk(EDirection.NONE);
         }
 

@@ -13,6 +13,7 @@ public class Player extends Interactable {
     private int targetDegree;
     private float movementSpeed = 8;
     private EDirection walkingDirection = EDirection.NONE;
+    private boolean canJump = true;
 
     /**
      * @param location  : current location of the interactable
@@ -29,6 +30,13 @@ public class Player extends Interactable {
 
     }
 
+
+    public void jump(){
+        if(canJump){
+            //do
+            canJump = false;
+        }
+    }
 
 
     @Override
@@ -70,6 +78,9 @@ public class Player extends Interactable {
                 x.getForce().set(1,0);
                 x.getForce().multiply(this.movementSpeed);
                 break;
+            case NONE:
+                x.getForce().set(0,0);
+                break;
             case UP:
                 break;
             case DOWN:
@@ -103,5 +114,13 @@ public class Player extends Interactable {
 
     public void setWalkingDirection(EDirection walkingDirection) {
         this.walkingDirection = walkingDirection;
+    }
+
+    private boolean isCanJump() {
+        return canJump;
+    }
+
+    private void setCanJump(boolean canJump) {
+        this.canJump = canJump;
     }
 }

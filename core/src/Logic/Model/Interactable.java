@@ -22,6 +22,7 @@ public abstract class Interactable implements Serializable{
     private WorldMap worldMap;
     private ISessionManager sessionManager;
     private Vector2D zeroVector = new Vector2D(0,0);
+    private float gravity = 10;
 
 
 
@@ -234,5 +235,13 @@ public abstract class Interactable implements Serializable{
 
     public void setForces(List<Force> forces) {
         this.forces = forces;
+    }
+
+    public float getGravity() {
+        return gravity;
+    }
+
+    public void setGravity(float gravity) {
+        this.gravity = gravity;
     }
 }
