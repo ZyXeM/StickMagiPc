@@ -1,5 +1,6 @@
 package Controllers;
 
+import Logic.Interface.IUpdateManager;
 import Logic.Messages.LoginMsg;
 import Logic.Messages.MessagePackage;
 import Logic.Model.Account;
@@ -7,22 +8,26 @@ import Logic.Que.PackageBundle;
 import Server.PlayerConnection;
 
 import java.net.InetSocketAddress;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 
-public class GameController implements IGameController {
+public class GameController {
 
-  private  ArrayList<IMapController> gameList;
+  private ArrayList<IMapController> gameList;
   private ArrayList<PlayerConnection> playerList;
   private Map<InetSocketAddress,IMapController> playerMap;
   private int numberOfMaxPlayers = 5;
+  private RmiGameController gameController;
 
-    public GameController() {
+    public GameController() throws RemoteException {
+
         gameList = new ArrayList<>();
         playerList = new ArrayList<>();
         playerMap = new HashMap<>();
+        gameController = new RmiGameController(this);
     }
 
 
@@ -31,10 +36,10 @@ public class GameController implements IGameController {
      * @param messagePackage
      * @param address
      */
-    private void handleLogin(LoginMsg messagePackage, InetSocketAddress address) {
+    public int handleLogin(LoginMsg messagePackage, InetSocketAddress address, IUpdateManager iUpdateManager) {
         if(!this.login(messagePackage.getAccount())){
             //Show error message /feedback
-            return;
+            return 0;
         }
 
         //searches if you're logged in
@@ -49,8 +54,11 @@ public class GameController implements IGameController {
             PlayerConnection playerConnection = new PlayerConnection();
             playerConnection.setAddress(address);
             playerConnection.setAccount(messagePackage.getAccount());
+            playerConnection.setUpdateManager(iUpdateManager);
             this.findMatch(playerConnection);
         }
+       return playerMap.get(address).getPlayerList().size();
+
     }
 
     /**
@@ -114,12 +122,12 @@ public class GameController implements IGameController {
     }
 
 
-    @Override
+
     public void handlePackage(PackageBundle packet) {
         System.out.println("got Package");
         MessagePackage messagePackage = packet.getMsg();
         if(messagePackage instanceof LoginMsg){
-            this.handleLogin((LoginMsg)messagePackage,packet.getAddress());
+            this.handleLogin((LoginMsg)messagePackage,packet.getAddress(),null);
         }
         else{
             this.qMessage(packet);
@@ -127,12 +135,14 @@ public class GameController implements IGameController {
         }
     }
 
+
     private void qMessage(PackageBundle packet) {
         System.out.println("Qmessage");
       IMapController object =  this.playerMap.get(packet.getAddress());
       object.addPacketQ(packet);
+    }
 
-
-
+    public RmiGameController getGameController() {
+        return gameController;
     }
 }

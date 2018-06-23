@@ -9,8 +9,12 @@ import Logic.Model.InGameObject;
 import Logic.Model.Player;
 import Logic.Model.Spell;
 
-public interface IUpdateManager {
-   void addInteractableUpdate(AddInteractableMsg interactableMsg);
-   void updateLocation(UpdateLocationMsg locationMsg);
-   void updateRotation(UpdateRotationMsg rotationMsg);
+import java.io.Serializable;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+
+public interface IUpdateManager extends Remote {
+   void addInteractableUpdate(AddInteractableMsg interactableMsg) throws RemoteException;
+   void updateLocation(UpdateLocationMsg locationMsg)  throws RemoteException;
+   void updateRotation(UpdateRotationMsg rotationMsg) throws RemoteException;
 }

@@ -3,24 +3,24 @@ package Logic.Model;
 import Logic.Enummeration.EDirection;
 import Logic.Interface.IDrawManager;
 import Logic.Interface.ISessionManager;
-import Logic.Interface.IUpdateManager;
 import Logic.Messages.AddInteractableMsg;
 import Logic.Messages.UpdateLocationMsg;
 import Logic.Messages.UpdateRotationMsg;
 import Session.SessionManager;
 
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class WorldMap implements IUpdateManager {
+public class WorldMap {
     private List<Player> players;
     private List<InGameObject> inGameObjects;
     private List<Spell> spellList;
+    private List<Interactable> drawables;
     private IDrawManager drawManager;
     private ISessionManager iSessionManager;
     private Player focusedPlayer;
+    private static int idRange;
 
     public WorldMap(IDrawManager drawManager) {
         this.drawManager = drawManager;
@@ -28,7 +28,8 @@ public class WorldMap implements IUpdateManager {
         players = new ArrayList<>();
         inGameObjects = new ArrayList<>();
         spellList = new ArrayList<>();
-        this.iSessionManager.login(new Account("mitch","mitch"));
+        drawables = new ArrayList<>();
+
     }
 
     public WorldMap() {
@@ -36,7 +37,13 @@ public class WorldMap implements IUpdateManager {
         players = new ArrayList<>();
         inGameObjects = new ArrayList<>();
         spellList = new ArrayList<>();
+        drawables = new ArrayList<>();
 
+    }
+
+    public int getNexzID(){
+        idRange ++;
+        return idRange;
     }
 
     /**
@@ -48,6 +55,12 @@ public class WorldMap implements IUpdateManager {
         while(playerIterator.hasNext()){
            Player player = playerIterator.next();
            player.update(deltaTime);
+        }
+
+        Iterator<Spell> spellIterator = spellList.iterator();
+        while(spellIterator.hasNext()){
+            Spell spell = spellIterator.next();
+            spell.update(deltaTime);
         }
 
 //        Iterator<InGameObject> inGameObjectIterator = inGameObjects.iterator();
@@ -90,11 +103,13 @@ public class WorldMap implements IUpdateManager {
         list.addAll(this.inGameObjects);
         list.addAll(this.players);
         list.addAll(this.spellList);
+        list.addAll(this.drawables);
         return list;
     }
 
     public void addInteractable(Interactable interactable){
         interactable.setSessionManager(this.iSessionManager);
+        interactable.setWorldMap(this);
         if(interactable instanceof  Spell){
             this.spellList.add((Spell)interactable);
         }else
@@ -117,11 +132,18 @@ public class WorldMap implements IUpdateManager {
      * @param deltaTime
      */
     public void render(float deltaTime){
+
+        for (InGameObject i : this.inGameObjects){
+            i.draw(this.drawManager);
+        }
+        for (Spell i : this.spellList){
+            i.draw(this.drawManager);
+        }
         for (Player p: this.players){
             p.draw(this.drawManager);
         }
-        for (InGameObject i : this.inGameObjects){
-            i.draw(this.drawManager);
+        for (Interactable p: this.drawables){
+            p.draw(this.drawManager);
         }
     }
 
@@ -133,26 +155,25 @@ public class WorldMap implements IUpdateManager {
         this.spellList = spellList;
     }
 
-    @Override
+
     public void addInteractableUpdate(AddInteractableMsg interactableMsg) {
-            addInteractable(interactableMsg.getInteractable());
+           // addInteractable(interactableMsg.getInteractable());
+            drawables.add(interactableMsg.getInteractable());
 
     }
 
-    @Override
+
     public void updateLocation(UpdateLocationMsg locationMsg) {
 
         for(Interactable i : this.getInteractables()){
-            System.out.println("UpdateFor");
             if(i.getID() == locationMsg.getInteractableId()){
-                System.out.println("Update");
                 i.setLocation(locationMsg.getLocation());
             }
         }
 
     }
 
-    @Override
+
     public void updateRotation(UpdateRotationMsg rotationMsg) {
         for(Interactable i : this.getInteractables()){
             if(i.getID() == rotationMsg.getInteractableId()){
@@ -172,5 +193,17 @@ public class WorldMap implements IUpdateManager {
 
     public void setFocusedPlayer(Player focusedPlayer) {
         this.focusedPlayer = focusedPlayer;
+    }
+
+    public ISessionManager getISessionManager() {
+        return iSessionManager;
+    }
+
+    public void setIdRange(int idRange) {
+        this.idRange = idRange;
+    }
+
+    public int getIdRange() {
+        return idRange;
     }
 }

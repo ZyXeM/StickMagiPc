@@ -1,6 +1,7 @@
 package Managers;
 
 import Controllers.GameController;
+import Logic.Interface.IGameController;
 import Logic.Messages.MessagePackage;
 import Logic.Que.PackageBundle;
 
@@ -9,6 +10,9 @@ import java.io.IOException;
 
 import java.io.ObjectInputStream;
 import java.net.*;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -19,7 +23,13 @@ public class SessionManagerServer {
 
     DatagramSocket datagramSocket;
     public boolean createServer() throws SocketException {
-        this.gameController = new GameController();
+        try {
+            this.gameController = new GameController();
+            Registry registry = LocateRegistry.createRegistry(777);
+            registry.rebind("IGameController", (IGameController)this.gameController.getGameController());
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
         byte[] receiveData = new byte[1024];
 
         Logger.getAnonymousLogger().log( Level.INFO,"creating server");

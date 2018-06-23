@@ -26,13 +26,16 @@ public class InputHandeler implements IInputHandeler {
     }
 
     @Override
-    public boolean use(int inventorySlot) {
-        return false;
+    public boolean use(int inventorySlot, Vector2D direction) {
+        worldMap.getFocusedPlayer().use(direction);
+        return true;
     }
+
 
     @Override
     public boolean jump() {
-        return false;
+        worldMap.getFocusedPlayer().jump();
+        return true;
     }
 
 

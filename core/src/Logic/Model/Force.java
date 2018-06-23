@@ -1,6 +1,8 @@
 package Logic.Model;
 
-public class Force {
+import java.io.Serializable;
+
+public class Force implements Serializable {
     private String name;
     private Vector2D force;
     private boolean permanent;

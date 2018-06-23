@@ -7,6 +7,7 @@ import java.awt.*;
 import java.util.List;
 
 public class InGameObject extends Interactable {
+    private Vector2D size;
 
 
     /**
@@ -17,6 +18,11 @@ public class InGameObject extends Interactable {
      */
     public InGameObject(Vector2D location, int rotation, int maxHealth, List<Shape> hitBoxes, WorldMap worldMap, ISessionManager iSessionManager) {
         super(location, rotation, maxHealth, hitBoxes, worldMap,iSessionManager);
+    }
+    public InGameObject(WorldMap worldMap,ISessionManager iSessionManager){
+        super(worldMap,iSessionManager);
+        this.setGravity(0);
+
     }
 
     @Override
@@ -30,4 +36,11 @@ public class InGameObject extends Interactable {
     }
 
 
+    public Vector2D getSize() {
+        return size;
+    }
+
+    public void setSize(Vector2D size) {
+        this.size = size;
+    }
 }

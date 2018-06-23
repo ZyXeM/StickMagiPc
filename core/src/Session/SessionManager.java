@@ -1,8 +1,11 @@
 package Session;
 
+import Logic.Interface.IGameController;
 import Logic.Interface.ISessionManager;
+import Logic.Interface.IUpdateManager;
 import Logic.Messages.*;
 import Logic.Model.Account;
+import Logic.Model.Client;
 import Logic.Model.Interactable;
 import Logic.Model.WorldMap;
 import Logic.Que.ObjectQueue;
@@ -11,28 +14,45 @@ import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.net.*;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 
 public class SessionManager implements ISessionManager {
+    private  Client client;
     transient ExecutorService e;
     ObjectQueue objectQueue;
     private WorldMap worldMap;
     Thread listener;
+    IGameController link;
 
 
 
     public SessionManager(WorldMap worldMap) {
         this.worldMap = worldMap;
         this.e = Executors.newCachedThreadPool();
-
-
         objectQueue = new ObjectQueue(getServerAdres());
         objectQueue.start();
         listener = new Thread(new ClientListener(this));
         listener.start();
+        Registry registry;
+        try {
+            registry = LocateRegistry.getRegistry("127.0.0.1", 777);
+            link = (IGameController) registry.lookup("IGameController");
+            Client c = new Client(this.worldMap);
+            this.client = c;
+        } catch (RemoteException ex) {
+            System.out.println(ex.toString());
+        } catch (NotBoundException ex) {
+            System.out.println(ex.toString());
+        }
+
+
     }
 
     public ArrayList<InetSocketAddress> getServerAdres(){
@@ -61,14 +81,11 @@ public class SessionManager implements ISessionManager {
 
     @Override
     public void sendLocation(Interactable location) {
-        System.out.println("Sendlocation");
         UpdateLocationMsg locationMsg = new UpdateLocationMsg();
         locationMsg.setLocation(location.getLocation());
         locationMsg.setId(3);
         locationMsg.setInteractableId(location.getID());
-
         broadcastToServer(locationMsg);
-
     }
 
     @Override
@@ -76,13 +93,18 @@ public class SessionManager implements ISessionManager {
         AddInteractableMsg interactableMsg = new AddInteractableMsg();
         interactableMsg.setInteractable(interactable);
         PackageBundle packageBundle = new PackageBundle(null,interactableMsg);
-        objectQueue.checkQ(packageBundle);
+        try {
+            this.link.handlePackage(packageBundle);
+        } catch (RemoteException e1) {
+            e1.printStackTrace();
+        }
+//        objectQueue.checkQ(packageBundle);
 
     }
 
     @Override
     public void handleMessage(MessagePackage messagePackage) {
-        System.out.println("Handle map package");
+
 
         if(messagePackage instanceof ConfirmationMsg){
             this.objectQueue.confirmQUpdate(new PackageBundle(getServerAdres().get(0),messagePackage));
@@ -106,7 +128,13 @@ public class SessionManager implements ISessionManager {
         LoginMsg loginMsg = new LoginMsg();
         loginMsg.setId(5);
         loginMsg.setAccount(account);
-        this.broadcastToServer(loginMsg);
+        try {
+           int idRange = link.rmiLogin(loginMsg,(IUpdateManager) client);
+           this.worldMap.setIdRange(idRange);
+        } catch (RemoteException e1) {
+            e1.printStackTrace();
+        }
+        // this.broadcastToServer(loginMsg);
 
 
     }
@@ -116,11 +144,10 @@ public class SessionManager implements ISessionManager {
      * @param messagePackage
      */
     private void broadcastToServer(MessagePackage messagePackage) {
-        System.out.println("broadcastClient");
+
 
         Runnable run = () -> {
             try {
-
                 ByteArrayOutputStream bStream = new ByteArrayOutputStream();
                 ObjectOutput oo = new ObjectOutputStream(bStream);
                 oo.writeObject(messagePackage);
@@ -128,12 +155,10 @@ public class SessionManager implements ISessionManager {
                 byte[] serializedMessage = bStream.toByteArray();
                 DatagramSocket datagramSocket = new DatagramSocket();
                 InetAddress IPAddress = InetAddress.getByName("localhost");
-
                 DatagramPacket packet = new DatagramPacket(serializedMessage, serializedMessage.length,getServerAdres().get(0).getAddress() , 2000);
-                System.out.println("PackageSendClient");
+
                 datagramSocket.send(packet);
-                System.out.println("PackageSendClient");
-                System.out.println(messagePackage.getId());
+
 
 
             } catch (Exception e) {

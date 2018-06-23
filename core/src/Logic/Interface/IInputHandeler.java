@@ -1,6 +1,7 @@
 package Logic.Interface;
 
 import Logic.Enummeration.EDirection;
+import Logic.Model.Vector2D;
 
 
 public interface IInputHandeler {
@@ -27,8 +28,7 @@ public interface IInputHandeler {
      * @param inventorySlot : number slot to use within your actionbar starting from the left at 1
      * @return Successful
      */
-    boolean use(int inventorySlot);
-
+    boolean use(int inventorySlot, Vector2D direction);
     /**
      * @return
      */

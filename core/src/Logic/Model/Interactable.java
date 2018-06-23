@@ -3,13 +3,15 @@ package Logic.Model;
 import Logic.Enummeration.EType;
 import Logic.Interface.IDrawManager;
 import Logic.Interface.ISessionManager;
+import Session.SessionManager;
+
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-public abstract class Interactable implements Serializable{
+public abstract class Interactable implements Serializable {
 
     private int ID;
     private Vector2D movement;
@@ -19,19 +21,20 @@ public abstract class Interactable implements Serializable{
     private int maxHealth;
     private int currentHealth;
     private List<Shape> hitBoxes;
-    private WorldMap worldMap;
-    private ISessionManager sessionManager;
-    private Vector2D zeroVector = new Vector2D(0,0);
-    private float gravity = 10;
-
+    transient WorldMap worldMap;
+    transient ISessionManager sessionManager;
+    private Vector2D zeroVector = new Vector2D(0, 0);
+    private float gravity = -6;
+    private boolean goingCollide = false;
+    private boolean gravApplied = false;
 
 
     /**
-     * @param location : current location of the interactable
-     * @param rotation : current rotation of the interactable
+     * @param location  : current location of the interactable
+     * @param rotation  : current rotation of the interactable
      * @param maxHealth : initial health of the interactable
-     * @param hitBoxes : collection of shapes which form the hit-box relative to the origin
-     * @param worldMap : map as reference to interact with other interactables
+     * @param hitBoxes  : collection of shapes which form the hit-box relative to the origin
+     * @param worldMap  : map as reference to interact with other interactables
      */
     public Interactable(Vector2D location, int rotation, int maxHealth, List<Shape> hitBoxes, WorldMap worldMap, ISessionManager sessionManager) {
         this.location = location;
@@ -41,98 +44,215 @@ public abstract class Interactable implements Serializable{
         this.hitBoxes = hitBoxes;
         this.worldMap = worldMap;
         this.sessionManager = sessionManager;
-        this.hitBoxes  = new ArrayList<>();
+        this.hitBoxes = new ArrayList<>();
         this.forces = new ArrayList<>();
+        forces.add(new Force("Gravity", new Vector2D(0, gravity), true));
+        this.setID(worldMap.getNexzID());
     }
 
-    public Interactable() {
-        this.hitBoxes  = new ArrayList<>();
+    public Interactable(WorldMap worldMap, ISessionManager sessionManager) {
+        this.worldMap = worldMap;
+        this.sessionManager = sessionManager;
+        this.hitBoxes = new ArrayList<>();
         this.forces = new ArrayList<>();
-
+        forces.add(new Force("Gravity", new Vector2D(0, gravity), true));
+        this.setID(worldMap.getNexzID());
     }
 
     /**
      * applies damage to the object
+     *
      * @param damage
      * @param damageType
      */
-    public void hit(float damage, EType damageType){
+    public void hit(float damage, EType damageType) {
         this.currentHealth -= damage;
     }
 
 
     /**
      * applies a directional force to an object
+     *
      * @param force : direction and amplitude of the force
      */
-    public void addForce(Vector2D force){
+    public void addForce(Vector2D force) {
         this.movement.add(force);
     }
+
     public abstract void draw(IDrawManager iDrawManager);
 
 
     /**
      * applies the current forces
      */
-    public void applyPhysics(float deltaTime){
-        movement = zeroVector.clone();
-        Iterator<Force> it = this.forces.iterator();
-        while(it.hasNext()){
-            Force force = it.next();
-            if(force.getForce().equals(zeroVector) && !force.isPermanent()){
-                it.remove();
+    public void applyPhysics(float deltaTime) {
+//        movement = zeroVector.clone();
+//        Vector2D grav = getForceOnName("Gravity").getForce();
+//        if (grav.y != 0)
+//            grav.set(0, grav.y - 10);
+//        Iterator<Force> it = this.forces.iterator();
+//        while (it.hasNext()) {
+//            Force force = it.next();
+//            if (force.getForce().equals(zeroVector) && !force.isPermanent()) {
+//                it.remove();
+//            } else {
+//                if (!force.getForce().equals(zeroVector)) {
+//                    movement.add(force.getForce());
+//                }
+//            }
+//        }
+//
+//        if (!movement.equals(zeroVector)) {
+//            for (InGameObject i : this.worldMap.getInGameObjects()) {
+//                if (i != this)
+//                    this.isColliding(i,new Vector2D((float)(location.x+movement.x),(float)(location.y+movement.y)));
+//            }
+//            if(this.goingCollide){
+//                applyPhysics(deltaTime);
+//            }else{
+//            this.location.add(this.movement.x, this.movement.y);
+//            sessionManager.sendLocation(this);
+//            }
+//        }
+
+
+      for (Force f : forces){
+          checkObjectColl(f.getName());
+      }
+        if(gravApplied){
+            Force f = getForceOnName("Gravity");
+            if(!f.getForce().equals(zeroVector)) {
+                f.getForce().set(f.getForce().x, f.getForce().y + gravity * deltaTime);
+                Force g = getForceOnName("Jump");
+                if(g!=null)
+                    g.getForce().set(0,0);
             }
-            else{
-                if(!force.getForce().equals(zeroVector)){
-                     movement.add(force.getForce());
+            gravApplied = false;
+
+        }
+        else{
+            Force f = getForceOnName("Gravity");
+            f.getForce().set(0,gravity);
+        }
+
+
+
+        sessionManager.sendLocation(this);
+
+
+
+
+
+
+
+
+
+    }
+
+    public boolean checkObjectColl(String name){
+        Force f = getForceOnName(name);
+        if(f != null){
+
+            Vector2D move = f.getForce();
+
+            Vector2D col2 = new Vector2D(location.x + move.x, location.y + move.y);
+            boolean coll = false;
+            boolean addVector2 = true;
+            for (InGameObject i : this.worldMap.getInGameObjects()) {
+                if (isColliding(i, col2)) {
+                    addVector2 = false;
+                }
+                else {
+                    coll = true;
                 }
             }
-
+            if(addVector2){
+                if(name.equals("Gravity")){
+                    gravApplied = true;
+                }
+                this.location.set(col2.x,col2.y);
+            }
+            return coll;
         }
-
-        if(!movement.equals(zeroVector)){
-
-        this.location.add(this.movement.x,this.movement.y);
-        sessionManager.sendLocation(this);
-        }
+       return false;
     }
+
+
+    public Force getForceOnName(String name) {
+        for (Force f : getForces()) {
+            if (f.getName().equals(name))
+                return f;
+        }
+        return null;
+    }
+
 
     /**
      * checks if this interactable collides with another
      */
-    public void checkCollide(){
-        for (Player p: this.worldMap.getPlayers()){
+    public void checkCollide() {
+        for (Player p : this.worldMap.getPlayers()) {
+            if (p != this)
                 this.isColliding(p);
         }
-        for (InGameObject i: this.worldMap.getInGameObjects()){
-            this.isColliding(i);
-        }
-        for (Spell s: this.worldMap.getSpellList()){
-            this.isColliding(s);
-        }
 
+        for (Spell s : this.worldMap.getSpellList()) {
+            if (s != this)
+                this.isColliding(s);
+        }
     }
 
     /**
      * checks if the interactable is collding with target
+     *
      * @param interactable
      * @return true if the objects collide
      */
-    public  boolean isColliding(Interactable interactable){
-        for (Shape shape:this.hitBoxes){
-            for (Shape shape2:interactable.hitBoxes){
-                if(shape.contains(shape2.getBounds2D())){
+    public boolean isColliding(Interactable interactable) {
+        boolean coll = false;
+        for (Shape shape : this.hitBoxes) {
+
+            for (Shape shape2 : interactable.hitBoxes) {
+                if (getRect(shape, this.getLocation()).intersects(getRect(shape2, interactable.getLocation()))) {
+
                     this.collide(interactable);
+                    coll = true;
+
                 }
             }
         }
-           return false;
+        return coll;
     }
 
+    public boolean isColliding(Interactable interactable, Vector2D newMovement) {
+        for (Shape shape : this.hitBoxes) {
+            for (Shape shape2 : interactable.hitBoxes) {
+                if (getRect(shape, newMovement).intersects(getRect(shape2, interactable.getLocation()))) {
+                    this.collide(interactable);
+                    return  true;
+                }
+            }
+        }
+        return false;
+    }
+
+
+    public Rectangle2D getRect(Shape shape, Vector2D location) {
+
+        if (shape instanceof Rectangle2D.Float) {
+            Rectangle2D.Float n = (Rectangle2D.Float) shape;
+            n.x = (float) location.x;
+            n.y = (float) location.y;
+
+            return n;
+        }
+        return null;
+    }
 
 
     /**
      * updates the objects internal state
+     *
      * @param deltaTime
      */
     abstract void update(float deltaTime);
@@ -140,12 +260,12 @@ public abstract class Interactable implements Serializable{
 
     /**
      * handles the interaction between two colliding objects
+     *
      * @param interactable
      */
-    public void collide(Interactable interactable){
+    public boolean collide(Interactable interactable) {
 
-
-
+        return false;
     }
 
 
@@ -208,15 +328,14 @@ public abstract class Interactable implements Serializable{
         this.ID = ID;
     }
 
-    public void changeRotation(int rotate){
-       int newRotation = (this.rotation + rotate);
-        if(newRotation >= 360){
-            setRotation(0+(newRotation-360));
+    public void changeRotation(int rotate) {
+        int newRotation = (this.rotation + rotate);
+        if (newRotation >= 360) {
+            setRotation(0 + (newRotation - 360));
 
-        }else
-        if(newRotation < 0){
+        } else if (newRotation < 0) {
             setRotation(360 + newRotation);
-        }else
+        } else
             this.setRotation(newRotation);
     }
 
@@ -243,5 +362,21 @@ public abstract class Interactable implements Serializable{
 
     public void setGravity(float gravity) {
         this.gravity = gravity;
+    }
+
+    public WorldMap getWorldMap() {
+        return worldMap;
+    }
+
+    public void setWorldMap(WorldMap worldMap) {
+        this.worldMap = worldMap;
+    }
+
+    public boolean isGoingCollide() {
+        return goingCollide;
+    }
+
+    public void setGoingCollide(boolean goingCollide) {
+        this.goingCollide = goingCollide;
     }
 }
