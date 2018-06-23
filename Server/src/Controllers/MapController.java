@@ -149,7 +149,6 @@ public class MapController extends Thread implements IMapController {
      * @param packageBundle
      */
     public void broadcastMessage(PackageBundle packageBundle) {
-        System.out.println("BroadcastingServer");
         Runnable run = () -> {
             try {
                 ByteArrayOutputStream bStream = new ByteArrayOutputStream();
@@ -162,7 +161,7 @@ public class MapController extends Thread implements IMapController {
                     if (p.getAddress().equals(packageBundle.getAddress()))
                         continue;
                     DatagramSocket datagramSocket = new DatagramSocket(null);
-                    DatagramPacket packet = new DatagramPacket(serializedMessage, serializedMessage.length, p.getAddress().getAddress(), p.getAddress().getPort() + 1);
+                    DatagramPacket packet = new DatagramPacket(serializedMessage, serializedMessage.length, p.getAddress().getAddress(), p.getAddress().getPort());
                     datagramSocket.send(packet);
                 }
 

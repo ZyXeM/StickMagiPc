@@ -124,7 +124,6 @@ public class GameController {
 
 
     public void handlePackage(PackageBundle packet) {
-        System.out.println("got Package");
         MessagePackage messagePackage = packet.getMsg();
         if(messagePackage instanceof LoginMsg){
             this.handleLogin((LoginMsg)messagePackage,packet.getAddress(),null);
@@ -137,9 +136,15 @@ public class GameController {
 
 
     private void qMessage(PackageBundle packet) {
-        System.out.println("Qmessage");
+        try{
       IMapController object =  this.playerMap.get(packet.getAddress());
-      object.addPacketQ(packet);
+      if(object != null)
+         object.addPacketQ(packet);
+
+        }catch (Exception e){
+            System.out.println("");
+        }
+
     }
 
     public RmiGameController getGameController() {

@@ -37,12 +37,11 @@ public class SessionManagerServer {
         while (true) {
             try {
                 DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-                System.out.println("waiting");
                 datagramSocket.receive(receivePacket);
                 ObjectInputStream iStream = new ObjectInputStream(new ByteArrayInputStream(receiveData));
                 MessagePackage msg = (MessagePackage) iStream.readObject();
                 iStream.close();
-                gameController.handlePackage(new PackageBundle(new InetSocketAddress(receivePacket.getAddress(),PORT_NUMBER_LOGIN),msg) );
+                gameController.handlePackage(new PackageBundle(new InetSocketAddress(receivePacket.getAddress(),PORT_NUMBER_LOGIN+1),msg) );
             } catch (IOException e) {
                 System.out.println("I/O error: " + e);
             } catch (ClassNotFoundException e) {

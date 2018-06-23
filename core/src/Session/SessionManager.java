@@ -130,7 +130,7 @@ public class SessionManager implements ISessionManager {
         loginMsg.setAccount(account);
         try {
            int idRange = link.rmiLogin(loginMsg,(IUpdateManager) client);
-           this.worldMap.setIdRange(idRange);
+           this.worldMap.setIdRange(idRange*1000);
         } catch (RemoteException e1) {
             e1.printStackTrace();
         }
@@ -148,6 +148,7 @@ public class SessionManager implements ISessionManager {
 
         Runnable run = () -> {
             try {
+
                 ByteArrayOutputStream bStream = new ByteArrayOutputStream();
                 ObjectOutput oo = new ObjectOutputStream(bStream);
                 oo.writeObject(messagePackage);
