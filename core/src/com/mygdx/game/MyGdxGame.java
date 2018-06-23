@@ -59,6 +59,8 @@ public class MyGdxGame extends ApplicationAdapter {
         object.getHitBoxes().add(new Rectangle2D.Float(0,0,800,20));
         worldMap.addInteractable(object);
         this.yourPlayer = p;
+        this.worldMap.getISessionManager().addInteractable(p);
+
 
     }
 
