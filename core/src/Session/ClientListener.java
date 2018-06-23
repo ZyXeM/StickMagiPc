@@ -28,8 +28,9 @@ public class ClientListener extends Thread {
             try {
 
                 InetAddress IPAddress = InetAddress.getByName("localhost");
+                InetSocketAddress inet = new InetSocketAddress("192.168.2.14",2001);
 
-                DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length, IPAddress, 2001);
+                DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length,inet.getAddress() , 2001);
                 datagramSocket.receive(receivePacket);
                 ObjectInputStream iStream = new ObjectInputStream(new ByteArrayInputStream(receiveData));
 
