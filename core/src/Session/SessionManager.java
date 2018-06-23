@@ -62,7 +62,7 @@ public class SessionManager implements ISessionManager {
         } catch (UnknownHostException e1) {
             e1.printStackTrace();
         }
-        InetSocketAddress inetSocketAddress = new InetSocketAddress("192.168.2.11",2000);
+        InetSocketAddress inetSocketAddress = new InetSocketAddress("192.168.2.14",2000);
         ArrayList<InetSocketAddress> list = new ArrayList<>();
         list.add(inetSocketAddress);
         return list;
