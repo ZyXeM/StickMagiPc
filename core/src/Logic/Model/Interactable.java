@@ -3,7 +3,6 @@ package Logic.Model;
 import Logic.Enummeration.EType;
 import Logic.Interface.IDrawManager;
 import Logic.Interface.ISessionManager;
-
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
@@ -78,6 +77,10 @@ public abstract class Interactable implements Serializable {
         this.forces.add(new Force(name,force,perm));
     }
 
+    /**
+     * Draws the interactable to the screen
+     * @param iDrawManager
+     */
     public abstract void draw(IDrawManager iDrawManager);
 
 
@@ -85,9 +88,11 @@ public abstract class Interactable implements Serializable {
      * applies the current forces
      */
     public void applyPhysics(float deltaTime) {
+        //Check for all forces if it will hit
       for (Force f : forces){
           checkObjectColl(f.getName());
       }
+      //If there is gravity applied accelerate
         if(gravApplied){
             Force f = getForceOnName("Gravity");
             if(!f.getForce().equals(zeroVector)) {
@@ -97,33 +102,24 @@ public abstract class Interactable implements Serializable {
                     g.getForce().set(0,0);
             }
             gravApplied = false;
-
         }
         else{
+          //else it the interactable can not move and will reset the gravity
             Force f = getForceOnName("Gravity");
             f.getForce().set(0,gravity);
         }
-
-
-
         sessionManager.sendLocation(this);
-
-
-
-
-
-
-
-
-
     }
 
+    /**
+     * Checks if the chosen force would collide
+     * @param name
+     * @return
+     */
     public boolean checkObjectColl(String name){
         Force f = getForceOnName(name);
         if(f != null){
-
             Vector2D move = f.getForce();
-
             Vector2D col2 = new Vector2D(location.x + move.x, location.y + move.y);
             boolean coll = false;
             boolean addVector2 = true;
@@ -135,6 +131,7 @@ public abstract class Interactable implements Serializable {
                     coll = true;
                 }
             }
+            //checks if the gravity is obstructed
             if(addVector2){
                 if(name.equals("Gravity")){
                     gravApplied = true;
@@ -147,6 +144,10 @@ public abstract class Interactable implements Serializable {
     }
 
 
+    /**
+     * @param name
+     * @return Force with the chosen name
+     */
     public Force getForceOnName(String name) {
         for (Force f : getForces()) {
             if (f.getName().equals(name))
@@ -193,6 +194,12 @@ public abstract class Interactable implements Serializable {
         return coll;
     }
 
+    /**
+     * checkes if the interactable would hit something with a new location
+     * @param interactable
+     * @param newMovement
+     * @return if the interactable would collide
+     */
     public boolean isColliding(Interactable interactable, Vector2D newMovement) {
         for (Shape shape : this.hitBoxes) {
             for (Shape shape2 : interactable.hitBoxes) {
@@ -206,6 +213,12 @@ public abstract class Interactable implements Serializable {
     }
 
 
+    /**
+     *
+     * @param shape
+     * @param location
+     * @return Hitbox of the chosen shape
+     */
     public Rectangle2D getRect(Shape shape, Vector2D location) {
 
         if (shape instanceof Rectangle2D.Float) {
@@ -297,6 +310,10 @@ public abstract class Interactable implements Serializable {
         this.ID = ID;
     }
 
+    /**
+     * changes the rotation between 0 and 360
+     * @param rotate
+     */
     public void changeRotation(int rotate) {
         int newRotation = (this.rotation + rotate);
         if (newRotation >= 360) {

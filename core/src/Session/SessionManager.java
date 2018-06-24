@@ -56,6 +56,9 @@ public class SessionManager implements ISessionManager {
 
     }
 
+    /**
+     * @return Server address
+     */
     public ArrayList<InetSocketAddress> getServerAdres(){
         InetAddress IPAddress = null;
         try {

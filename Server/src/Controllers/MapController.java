@@ -46,18 +46,30 @@ public class MapController extends Thread implements IMapController {
         e = Executors.newCachedThreadPool();
     }
 
+    /**
+     * Updates the location on the server map and broadcasts it to the other players
+     * @param packet
+     */
     public void updateLocation(PackageBundle packet) {
         worldMap.updateLocation((UpdateLocationMsg) packet.getMsg());
         this.broadcastMessage(packet);
     }
 
 
+    /**
+     * Updates the rotation on the server map and broadcasts it to the other players
+     * @param packet
+     */
     public void updateRotation(PackageBundle packet) {
         worldMap.updateRotation((UpdateRotationMsg) packet.getMsg());
         this.broadcastMessage(packet);
     }
 
 
+    /**
+     * adds the Interactable to the server world and sends it to the clients
+     * @param packet
+     */
     public void addInteractable(PackageBundle packet) {
         worldMap.addInteractable(((AddInteractableMsg)packet.getMsg()).getInteractable());
         for (PlayerConnection p : playerList
@@ -102,6 +114,8 @@ public class MapController extends Thread implements IMapController {
 
     @Override
     public void addPlayerConnection(PlayerConnection playerConnection) {
+
+        //sends all current objects in the world to the new player
         for(Interactable i :worldMap.getInteractables()){
             AddInteractableMsg msg = new AddInteractableMsg();
             msg.setInteractable(i);

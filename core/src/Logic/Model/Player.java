@@ -3,7 +3,6 @@ package Logic.Model;
 import Logic.Enummeration.EDirection;
 import Logic.Interface.IDrawManager;
 import Logic.Interface.ISessionManager;
-
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;

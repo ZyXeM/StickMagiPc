@@ -1,7 +1,6 @@
 package Logic.Que;
 
 import Logic.Messages.MessagePackage;
-
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 

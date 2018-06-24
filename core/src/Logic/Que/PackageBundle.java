@@ -1,7 +1,6 @@
 package Logic.Que;
 
 import Logic.Messages.MessagePackage;
-
 import java.io.Serializable;
 import java.net.InetSocketAddress;
 

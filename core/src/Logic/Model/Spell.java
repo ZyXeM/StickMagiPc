@@ -5,9 +5,6 @@ import Logic.Enummeration.EType;
 import Logic.Interface.IDrawManager;
 import Logic.Interface.ISessionManager;
 import Logic.Interface.IUseable;
-import Session.SessionManager;
-import com.sun.xml.internal.fastinfoset.algorithm.BuiltInEncodingAlgorithm;
-
 import java.awt.*;
 import java.util.List;
 
@@ -16,7 +13,6 @@ public class Spell extends Interactable implements IUseable {
 
     private int damage;
     private EType spellType;
-
     private int speed;
 
 

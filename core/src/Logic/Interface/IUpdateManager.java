@@ -14,6 +14,11 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 public interface IUpdateManager extends Remote {
+   /**
+    * Adds the interactable to the remote client
+    * @param interactableMsg
+    * @throws RemoteException
+    */
    void addInteractableUpdate(AddInteractableMsg interactableMsg) throws RemoteException;
    void updateLocation(UpdateLocationMsg locationMsg)  throws RemoteException;
    void updateRotation(UpdateRotationMsg rotationMsg) throws RemoteException;
