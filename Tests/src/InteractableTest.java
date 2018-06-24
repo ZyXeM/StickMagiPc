@@ -39,7 +39,7 @@ public class InteractableTest {
         //Adding force
         worldMap.getFocusedPlayer().addForce(new Vector2D(0,-6),"Random Force",true);
         worldMap.getFocusedPlayer().setLocation(new Vector2D(0,0));
-        //Updateing the gamelogic with 1 tick
+        //Updating the gamelogic with 1 tick
         worldMap.updateGameLogic(1);
         Vector2D test = worldMap.getFocusedPlayer().getLocation();
         Vector2D location = new Vector2D(0,-12);

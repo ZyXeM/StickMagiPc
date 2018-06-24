@@ -47,16 +47,19 @@ public class MapController extends Thread implements IMapController {
     }
 
     public void updateLocation(PackageBundle packet) {
+        worldMap.updateLocation((UpdateLocationMsg) packet.getMsg());
         this.broadcastMessage(packet);
     }
 
 
     public void updateRotation(PackageBundle packet) {
+        worldMap.updateRotation((UpdateRotationMsg) packet.getMsg());
         this.broadcastMessage(packet);
     }
 
 
     public void addInteractable(PackageBundle packet) {
+        worldMap.addInteractable(((AddInteractableMsg)packet.getMsg()).getInteractable());
         for (PlayerConnection p : playerList
                 ) {
             try {
@@ -99,6 +102,16 @@ public class MapController extends Thread implements IMapController {
 
     @Override
     public void addPlayerConnection(PlayerConnection playerConnection) {
+        for(Interactable i :worldMap.getInteractables()){
+            AddInteractableMsg msg = new AddInteractableMsg();
+            msg.setInteractable(i);
+            try {
+                playerConnection.getUpdateManager().addInteractableUpdate(msg);
+            } catch (RemoteException e1) {
+                e1.printStackTrace();
+            }
+        }
+
         this.playerList.add(playerConnection);
     }
 
