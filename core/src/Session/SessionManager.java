@@ -43,7 +43,7 @@ public class SessionManager implements ISessionManager {
         listener.start();
         Registry registry;
         try {
-            registry = LocateRegistry.getRegistry("127.0.0.1", 777);
+            registry = LocateRegistry.getRegistry("192.168.2.14", 777);
             link = (IGameController) registry.lookup("IGameController");
             Client c = new Client(this);
             this.client = c;
