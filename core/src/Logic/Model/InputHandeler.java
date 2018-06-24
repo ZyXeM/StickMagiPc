@@ -21,8 +21,9 @@ public class InputHandeler implements IInputHandeler {
     }
 
     @Override
-    public boolean rotate(boolean LeftRight) {
-        return false;
+    public boolean rotate(boolean leftRight) {
+        worldMap.rotate(leftRight);
+        return true;
     }
 
     @Override

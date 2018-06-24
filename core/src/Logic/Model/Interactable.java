@@ -3,7 +3,6 @@ package Logic.Model;
 import Logic.Enummeration.EType;
 import Logic.Interface.IDrawManager;
 import Logic.Interface.ISessionManager;
-import Session.SessionManager;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
@@ -75,8 +74,8 @@ public abstract class Interactable implements Serializable {
      *
      * @param force : direction and amplitude of the force
      */
-    public void addForce(Vector2D force) {
-        this.movement.add(force);
+    public void addForce(Vector2D force,String name,boolean perm) {
+        this.forces.add(new Force(name,force,perm));
     }
 
     public abstract void draw(IDrawManager iDrawManager);
@@ -86,36 +85,6 @@ public abstract class Interactable implements Serializable {
      * applies the current forces
      */
     public void applyPhysics(float deltaTime) {
-//        movement = zeroVector.clone();
-//        Vector2D grav = getForceOnName("Gravity").getForce();
-//        if (grav.y != 0)
-//            grav.set(0, grav.y - 10);
-//        Iterator<Force> it = this.forces.iterator();
-//        while (it.hasNext()) {
-//            Force force = it.next();
-//            if (force.getForce().equals(zeroVector) && !force.isPermanent()) {
-//                it.remove();
-//            } else {
-//                if (!force.getForce().equals(zeroVector)) {
-//                    movement.add(force.getForce());
-//                }
-//            }
-//        }
-//
-//        if (!movement.equals(zeroVector)) {
-//            for (InGameObject i : this.worldMap.getInGameObjects()) {
-//                if (i != this)
-//                    this.isColliding(i,new Vector2D((float)(location.x+movement.x),(float)(location.y+movement.y)));
-//            }
-//            if(this.goingCollide){
-//                applyPhysics(deltaTime);
-//            }else{
-//            this.location.add(this.movement.x, this.movement.y);
-//            sessionManager.sendLocation(this);
-//            }
-//        }
-
-
       for (Force f : forces){
           checkObjectColl(f.getName());
       }

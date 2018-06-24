@@ -8,6 +8,7 @@ public class ClientListener extends Thread {
 
 
     SessionManager sessionManager;
+    String hostIP = "192.168.2.14";
 
     public ClientListener(SessionManager sessionManager) {
 
@@ -26,10 +27,8 @@ public class ClientListener extends Thread {
         while (true) {
 
             try {
-
-                InetAddress IPAddress = InetAddress.getByName("localhost");
-
-                DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length, IPAddress, 2001);
+                InetSocketAddress i = new InetSocketAddress(hostIP,2001);
+                DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length, i.getAddress(), 2001);
                 datagramSocket.receive(receivePacket);
                 ObjectInputStream iStream = new ObjectInputStream(new ByteArrayInputStream(receiveData));
 

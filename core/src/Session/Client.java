@@ -1,5 +1,6 @@
-package Logic.Model;
+package Session;
 
+import Logic.Interface.ISessionManager;
 import Logic.Interface.IUpdateManager;
 import Logic.Messages.AddInteractableMsg;
 import Logic.Messages.UpdateLocationMsg;
@@ -9,26 +10,26 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
 public class Client extends UnicastRemoteObject implements IUpdateManager {
-  transient  private WorldMap worldMap;
+  transient  private ISessionManager sessionManager;
 
-    public Client(WorldMap worldMap) throws RemoteException {
+    public Client(ISessionManager sessionManager) throws RemoteException {
         super();
-        this.worldMap = worldMap;
+       this.sessionManager = sessionManager;
     }
 
     @Override
     public void addInteractableUpdate(AddInteractableMsg interactableMsg) throws RemoteException {
-        worldMap.addInteractableUpdate(interactableMsg);
+        sessionManager.addInteractableUpdate(interactableMsg);
     }
 
     @Override
     public void updateLocation(UpdateLocationMsg locationMsg) throws RemoteException {
-        worldMap.updateLocation(locationMsg);
+        sessionManager.locationUpdate(locationMsg);
     }
 
     @Override
     public void updateRotation(UpdateRotationMsg rotationMsg) throws RemoteException {
-        worldMap.updateRotation(rotationMsg);
+        sessionManager.rotationUpdate(rotationMsg);
 
     }
 }

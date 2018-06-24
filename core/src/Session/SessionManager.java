@@ -5,7 +5,6 @@ import Logic.Interface.ISessionManager;
 import Logic.Interface.IUpdateManager;
 import Logic.Messages.*;
 import Logic.Model.Account;
-import Logic.Model.Client;
 import Logic.Model.Interactable;
 import Logic.Model.WorldMap;
 import Logic.Que.ObjectQueue;
@@ -30,6 +29,8 @@ public class SessionManager implements ISessionManager {
     private WorldMap worldMap;
     Thread listener;
     IGameController link;
+    String hostIP = "192.168.2.14";
+
 
 
 
@@ -44,7 +45,7 @@ public class SessionManager implements ISessionManager {
         try {
             registry = LocateRegistry.getRegistry("127.0.0.1", 777);
             link = (IGameController) registry.lookup("IGameController");
-            Client c = new Client(this.worldMap);
+            Client c = new Client(this);
             this.client = c;
         } catch (RemoteException ex) {
             System.out.println(ex.toString());
@@ -62,7 +63,7 @@ public class SessionManager implements ISessionManager {
         } catch (UnknownHostException e1) {
             e1.printStackTrace();
         }
-        InetSocketAddress inetSocketAddress = new InetSocketAddress("192.168.2.14",2000);
+        InetSocketAddress inetSocketAddress = new InetSocketAddress(hostIP,2000);
         ArrayList<InetSocketAddress> list = new ArrayList<>();
         list.add(inetSocketAddress);
         return list;
@@ -139,6 +140,22 @@ public class SessionManager implements ISessionManager {
 
     }
 
+    @Override
+    public void rotationUpdate(UpdateRotationMsg rotation) {
+        this.worldMap.updateRotation(rotation);
+    }
+
+    @Override
+    public void locationUpdate(UpdateLocationMsg location) {
+        this.worldMap.updateLocation(location);
+    }
+
+    @Override
+    public void addInteractableUpdate(AddInteractableMsg interactable) {
+        this.worldMap.addInteractableUpdate(interactable);
+    }
+
+
     /**
      * Broadcasts the message to the server
      * @param messagePackage
@@ -155,7 +172,6 @@ public class SessionManager implements ISessionManager {
                 oo.close();
                 byte[] serializedMessage = bStream.toByteArray();
                 DatagramSocket datagramSocket = new DatagramSocket();
-                InetAddress IPAddress = InetAddress.getByName("localhost");
                 DatagramPacket packet = new DatagramPacket(serializedMessage, serializedMessage.length,getServerAdres().get(0).getAddress() , 2000);
 
                 datagramSocket.send(packet);

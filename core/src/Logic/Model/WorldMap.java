@@ -198,6 +198,9 @@ public class WorldMap {
     public ISessionManager getISessionManager() {
         return iSessionManager;
     }
+    public void setISessionManager(ISessionManager iSessionManager) {
+        this.iSessionManager = iSessionManager;
+    }
 
     public void setIdRange(int idRange) {
         this.idRange = idRange;
@@ -205,5 +208,16 @@ public class WorldMap {
 
     public int getIdRange() {
         return idRange;
+    }
+
+    public void rotate(boolean leftRight) {
+        if(leftRight){
+            getFocusedPlayer().changeRotation(2);
+
+        }
+        else{
+            getFocusedPlayer().changeRotation(-2);
+        }
+
     }
 }
