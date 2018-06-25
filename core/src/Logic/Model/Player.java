@@ -18,7 +18,7 @@ public class Player extends Interactable {
     private boolean canJump = true;
     private int selectedSlot = 0;
     private boolean colliding = false;
-    private int jumpHeigt = 40;
+    private int jumpHeigt = 10;
 
 
     /**
@@ -79,11 +79,11 @@ public class Player extends Interactable {
 
         walk();
         applyPhysics(deltaTime);
-        if(isGoingCollide()){
-            if(getForceOnName("Jump")!= null)
-             getForceOnName("Jump").getForce().set(0, 0);
-
-        }
+//        if(isGoingCollide()){
+//            if(getForceOnName("Jump")!= null)
+//             getForceOnName("Jump").getForce().set(0, 0);
+//
+//        }
         colliding = false;
         currentCoolDown += deltaTime;
      //   checkCollide();

@@ -62,7 +62,7 @@ public class Spell extends Interactable implements IUseable {
 
 
         Spell spell = new Spell(10,EType.FIRE,this.getWorldMap(),this.getSessionManager());
-        spell.setSpeed(1);
+        spell.setSpeed(9);
         Vector2D v = new Vector2D(direction);
         v.normalize();
         v.multiply(spell.getSpeed());

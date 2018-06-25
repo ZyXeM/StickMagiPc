@@ -22,7 +22,7 @@ public abstract class Interactable implements Serializable {
     transient WorldMap worldMap;
     transient ISessionManager sessionManager;
     private Vector2D zeroVector = new Vector2D(0, 0);
-    private float gravity = -6;
+    private float gravity = -7;
     private boolean goingCollide = false;
     private boolean gravApplied = false;
 
@@ -97,13 +97,14 @@ public abstract class Interactable implements Serializable {
             Force f = getForceOnName("Gravity");
             if(!f.getForce().equals(zeroVector)) {
                 f.getForce().set(f.getForce().x, f.getForce().y + gravity * deltaTime);
-                Force g = getForceOnName("Jump");
-                if(g!=null)
-                    g.getForce().set(0,0);
+
             }
             gravApplied = false;
         }
         else{
+          Force g = getForceOnName("Jump");
+            if(g!=null)
+                g.getForce().set(0,0);
           //else it the interactable can not move and will reset the gravity
             Force f = getForceOnName("Gravity");
             f.getForce().set(0,gravity);
@@ -120,6 +121,7 @@ public abstract class Interactable implements Serializable {
         Force f = getForceOnName(name);
         if(f != null){
             Vector2D move = f.getForce();
+            //Creating new Position
             Vector2D col2 = new Vector2D(location.x + move.x, location.y + move.y);
             boolean coll = false;
             boolean addVector2 = true;
@@ -136,6 +138,7 @@ public abstract class Interactable implements Serializable {
                 if(name.equals("Gravity")){
                     gravApplied = true;
                 }
+              // this.movement.add(f.getForce().x,f.getForce().y);
                 this.location.set(col2.x,col2.y);
             }
             return coll;
