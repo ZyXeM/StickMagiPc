@@ -85,7 +85,7 @@ public class MapController extends Thread implements IMapController {
     }
 
     @Override
-    public  void handlePacket(final PackageBundle packet) {
+    public synchronized void handlePacket(final PackageBundle packet) {
         MessagePackage messagePackage = packet.getMsg();
         if (messagePackage instanceof ConfirmationMsg) {
             this.objectQueue.confirmQUpdate(packet);

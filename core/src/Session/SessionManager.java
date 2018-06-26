@@ -170,7 +170,7 @@ public class SessionManager implements ISessionManager {
      */
     private void broadcastToServer(MessagePackage messagePackage) {
 
-
+        //Broadcast to the server
         Runnable run = () -> {
             try {
                 messagePackage.setPlayerId(this.playerID);
@@ -181,11 +181,7 @@ public class SessionManager implements ISessionManager {
                 byte[] serializedMessage = bStream.toByteArray();
                 DatagramSocket datagramSocket = new DatagramSocket();
                 DatagramPacket packet = new DatagramPacket(serializedMessage, serializedMessage.length,getServerAdres().get(0).getAddress() , 2000);
-
                 datagramSocket.send(packet);
-
-
-
             } catch (Exception e) {
 
             }
