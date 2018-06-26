@@ -42,7 +42,7 @@ public class InteractableTest {
         //Updating the gamelogic with 1 tick
         worldMap.updateGameLogic(1);
         Vector2D test = worldMap.getFocusedPlayer().getLocation();
-        Vector2D location = new Vector2D(0,-12);
+        Vector2D location = new Vector2D(0,-6+worldMap.getFocusedPlayer().getGravity());
         Assertions.assertTrue(location.equals(test),"Gravity does not work like it should");
 
     }

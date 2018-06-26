@@ -85,7 +85,7 @@ public class MapController extends Thread implements IMapController {
     }
 
     @Override
-    public void handlePacket(PackageBundle packet) {
+    public  void handlePacket(final PackageBundle packet) {
         MessagePackage messagePackage = packet.getMsg();
         if (messagePackage instanceof ConfirmationMsg) {
             this.objectQueue.confirmQUpdate(packet);
@@ -101,6 +101,10 @@ public class MapController extends Thread implements IMapController {
         }
     }
 
+    /**
+     * Ads a packet to the game queue
+     * @param msg
+     */
     public void addPacketQ(PackageBundle msg) {
         try {
             this.lock.lock();

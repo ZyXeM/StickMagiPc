@@ -63,11 +63,7 @@ public class WorldMap {
             spell.update(deltaTime);
         }
 
-//        Iterator<InGameObject> inGameObjectIterator = inGameObjects.iterator();
-//        while(inGameObjectIterator.hasNext()){
-//            InGameObject player = inGameObjectIterator.next();
-//            player.update(deltaTime);
-//        }
+
 
 
 

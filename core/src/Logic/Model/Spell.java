@@ -50,7 +50,8 @@ public class Spell extends Interactable implements IUseable {
 
     @Override
     public  void update(float deltaTime) {
-        applyPhysics(deltaTime);
+        if(this.getLocation().distance(worldMap.getFocusedPlayer().getLocation()) < 900)
+            applyPhysics(deltaTime);
 
 
     }

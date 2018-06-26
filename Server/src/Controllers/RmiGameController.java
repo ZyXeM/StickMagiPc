@@ -3,6 +3,7 @@ package Controllers;
 import Logic.Interface.IGameController;
 import Logic.Interface.IUpdateManager;
 import Logic.Messages.LoginMsg;
+import Logic.Model.Account;
 import Logic.Model.WorldMap;
 import Logic.Que.PackageBundle;
 
@@ -25,6 +26,12 @@ public class RmiGameController extends UnicastRemoteObject implements IGameContr
 
           return  gameController.handleLogin(loginMsg, getAdress(), updateManager);
 
+    }
+
+    @Override
+    public boolean rmiRegister(Account account) throws RemoteException {
+
+        return gameController.register(account);
     }
 
     @Override

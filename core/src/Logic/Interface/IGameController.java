@@ -2,6 +2,7 @@ package Logic.Interface;
 
 import Logic.Interface.IUpdateManager;
 import Logic.Messages.LoginMsg;
+import Logic.Model.Account;
 import Logic.Que.PackageBundle;
 
 import java.rmi.Remote;
@@ -17,6 +18,13 @@ public interface IGameController extends Remote{
      */
     int rmiLogin(LoginMsg loginMsg, IUpdateManager updateManager) throws RemoteException;
 
+
+    /**
+     * Handles the register of the account
+     * @param account
+     * @throws RemoteException
+     */
+    boolean rmiRegister(Account account) throws RemoteException;
     /**
      * Handles the current message
      * @param packet

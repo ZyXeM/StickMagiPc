@@ -19,9 +19,11 @@ public class GameController {
   private ArrayList<IMapController> gameList;
   private ArrayList<PlayerConnection> playerList;
   private Map<InetSocketAddress,IMapController> playerMap;
-    private Map<Integer,IMapController> playerMapAccount;
+  private Map<Integer,IMapController> playerMapAccount;
   private int numberOfMaxPlayers = 5;
   private RmiGameController gameController;
+
+
 
     public GameController() throws RemoteException {
 
@@ -114,7 +116,7 @@ public class GameController {
      * @return
      */
     private boolean login(Account account) {
-        //check if name and password are correct
+        //Todo: check if the password and name match
         return true;
     }
 
@@ -156,5 +158,15 @@ public class GameController {
 
     public RmiGameController getGameController() {
         return gameController;
+    }
+
+    /**
+     * Register target account
+     * @param account
+     * @return true if account succefully registered
+     */
+    public boolean register(Account account) {
+        //Todo: Register the player
+        return true;
     }
 }
