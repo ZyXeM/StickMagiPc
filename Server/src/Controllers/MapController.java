@@ -75,7 +75,7 @@ public class MapController extends Thread implements IMapController {
         for (PlayerConnection p : playerList
                 ) {
             try {
-                if (p.getAddress().equals(packet.getAddress()))
+                if (packet.getMsg().getPlayerId() == p.getAccount().getID())
                     continue;
                 p.getUpdateManager().addInteractableUpdate((AddInteractableMsg) packet.getMsg());
             } catch (RemoteException e1) {
@@ -185,7 +185,7 @@ public class MapController extends Thread implements IMapController {
                 oo.close();
                 byte[] serializedMessage = bStream.toByteArray();
                 for (PlayerConnection p : this.playerList) {
-                    if (p.getAddress().equals(packageBundle.getAddress()))
+                    if (p.getAccount().getID() == packageBundle.getMsg().getPlayerId())
                         continue;
                     DatagramSocket datagramSocket = new DatagramSocket(null);
                     DatagramPacket packet = new DatagramPacket(serializedMessage, serializedMessage.length, p.getAddress().getAddress(), p.getAddress().getPort());

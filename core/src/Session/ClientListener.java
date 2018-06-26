@@ -9,6 +9,7 @@ public class ClientListener extends Thread {
 
     SessionManager sessionManager;
     String hostIP = "192.168.2.14";
+    private int port = 2000;
 
     public ClientListener(SessionManager sessionManager) {
 
@@ -18,7 +19,7 @@ public class ClientListener extends Thread {
     public void run() {
         DatagramSocket datagramSocket = null;
         try {
-            datagramSocket = new DatagramSocket(2001);
+            datagramSocket = new DatagramSocket(port);
         } catch (SocketException e) {
             e.printStackTrace();
         }
@@ -27,8 +28,9 @@ public class ClientListener extends Thread {
         while (true) {
 
             try {
-                InetSocketAddress i = new InetSocketAddress(hostIP,2001);
-                DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length, i.getAddress(), 2001);
+                System.out.println("receiving");
+                InetSocketAddress i = new InetSocketAddress(hostIP,port);
+                DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length, i.getAddress(), port);
                 datagramSocket.receive(receivePacket);
                 ObjectInputStream iStream = new ObjectInputStream(new ByteArrayInputStream(receiveData));
 
@@ -47,4 +49,7 @@ public class ClientListener extends Thread {
     }
 
 
+    public void setPort(int port) {
+        this.port = port;
+    }
 }

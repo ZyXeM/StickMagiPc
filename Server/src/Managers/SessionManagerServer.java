@@ -41,7 +41,7 @@ public class SessionManagerServer {
                 ObjectInputStream iStream = new ObjectInputStream(new ByteArrayInputStream(receiveData));
                 MessagePackage msg = (MessagePackage) iStream.readObject();
                 iStream.close();
-                gameController.handlePackage(new PackageBundle(new InetSocketAddress(receivePacket.getAddress(),PORT_NUMBER_LOGIN+1),msg) );
+                gameController.handlePackage(new PackageBundle(new InetSocketAddress(receivePacket.getAddress(),receivePacket.getPort()),msg) );
             } catch (IOException e) {
                 System.out.println("I/O error: " + e);
             } catch (ClassNotFoundException e) {

@@ -19,6 +19,7 @@ public class GameController {
   private ArrayList<IMapController> gameList;
   private ArrayList<PlayerConnection> playerList;
   private Map<InetSocketAddress,IMapController> playerMap;
+    private Map<Integer,IMapController> playerMapAccount;
   private int numberOfMaxPlayers = 5;
   private RmiGameController gameController;
 
@@ -28,6 +29,7 @@ public class GameController {
         playerList = new ArrayList<>();
         playerMap = new HashMap<>();
         gameController = new RmiGameController(this);
+        playerMapAccount = new HashMap<>();
     }
 
 
@@ -50,14 +52,15 @@ public class GameController {
             }
         }
         //If you're not logged in it wil make a new playerconnection and find a match
+        PlayerConnection playerConnection = new PlayerConnection();
         if(!loggedIn){
-            PlayerConnection playerConnection = new PlayerConnection();
+            messagePackage.getAccount().setID(playerList.size()+1);
             playerConnection.setAddress(address);
             playerConnection.setAccount(messagePackage.getAccount());
             playerConnection.setUpdateManager(iUpdateManager);
             this.findMatch(playerConnection);
         }
-       return playerMap.get(address).getPlayerList().size();
+       return playerMap.get(playerConnection.getAddress()).getPlayerList().size();
 
     }
 
@@ -70,9 +73,11 @@ public class GameController {
         boolean newGame = true;
         for(IMapController map : this.gameList){
             if(map.getPlayerList().size() <= numberOfMaxPlayers){
+                playerConnection.setAddress(new InetSocketAddress(playerConnection.getAddress().getAddress().getHostAddress(),2002+map.getPlayerList().size()));
                 map.addPlayerConnection(playerConnection);
                 newGame = false;
                 this.playerMap.put(playerConnection.getAddress(), map);
+                this.playerMapAccount.put(playerMap.size(), map);
             }
         }
         if(newGame){
@@ -90,11 +95,13 @@ public class GameController {
     private boolean createGame(PlayerConnection playerConnection) {
         System.out.println("Creating game");
         IMapController controller = new MapController();
+        playerConnection.setAddress(new InetSocketAddress(playerConnection.getAddress().getAddress().getHostAddress(),2002));
         controller.addPlayerConnection(playerConnection);
         this.playerList.add(playerConnection);
         playerConnection.setGame(controller);
         this.gameList.add(controller);
         this.playerMap.put(playerConnection.getAddress(),controller);
+        this.playerMapAccount.put(playerMap.size(), controller);
         Thread t = new Thread((MapController)controller);
         t.start();
 
@@ -137,7 +144,7 @@ public class GameController {
 
     private void qMessage(PackageBundle packet) {
         try{
-      IMapController object =  this.playerMap.get(packet.getAddress());
+      IMapController object =  this.playerMapAccount.get(packet.getMsg().getPlayerId());
       if(object != null)
          object.addPacketQ(packet);
 

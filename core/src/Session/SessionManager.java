@@ -30,6 +30,7 @@ public class SessionManager implements ISessionManager {
     Thread listener;
     IGameController link;
     String hostIP = "192.168.2.14";
+    private int playerID = 0;
 
 
 
@@ -37,10 +38,8 @@ public class SessionManager implements ISessionManager {
     public SessionManager(WorldMap worldMap) {
         this.worldMap = worldMap;
         this.e = Executors.newCachedThreadPool();
-        objectQueue = new ObjectQueue(getServerAdres());
-        objectQueue.start();
-        listener = new Thread(new ClientListener(this));
-        listener.start();
+//        objectQueue = new ObjectQueue(getServerAdres());
+//        objectQueue.start();
         Registry registry;
         try {
             registry = LocateRegistry.getRegistry("192.168.2.14", 777);
@@ -97,6 +96,7 @@ public class SessionManager implements ISessionManager {
         AddInteractableMsg interactableMsg = new AddInteractableMsg();
         interactableMsg.setInteractable(interactable);
         PackageBundle packageBundle = new PackageBundle(null,interactableMsg);
+        packageBundle.getMsg().setPlayerId(this.playerID);
         try {
             this.link.handlePackage(packageBundle);
         } catch (RemoteException e1) {
@@ -135,6 +135,11 @@ public class SessionManager implements ISessionManager {
         try {
            int idRange = link.rmiLogin(loginMsg,(IUpdateManager) client);
            this.worldMap.setIdRange(idRange*1000);
+            this.playerID = idRange;
+           ClientListener l = new ClientListener(this);
+           l.setPort(2001+idRange);
+            listener = new Thread(l);
+            listener.start();
         } catch (RemoteException e1) {
             e1.printStackTrace();
         }
@@ -168,7 +173,7 @@ public class SessionManager implements ISessionManager {
 
         Runnable run = () -> {
             try {
-
+                messagePackage.setPlayerId(this.playerID);
                 ByteArrayOutputStream bStream = new ByteArrayOutputStream();
                 ObjectOutput oo = new ObjectOutputStream(bStream);
                 oo.writeObject(messagePackage);
