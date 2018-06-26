@@ -57,7 +57,19 @@ public class MyGdxGame extends ApplicationAdapter {
         object.setSize(new Vector2D(800,20));
         object.setLocation(new Vector2D(-400,-64));
         object.getHitBoxes().add(new Rectangle2D.Float(0,0,800,20));
+
+        InGameObject object2 = new InGameObject(this.worldMap,worldMap.getISessionManager());
+        object2.setSize(new Vector2D(20,100));
+        object2.setLocation(new Vector2D(-400,-44));
+        object2.getHitBoxes().add(new Rectangle2D.Float(0,0,20,100));
+
+        InGameObject object3 = new InGameObject(this.worldMap,worldMap.getISessionManager());
+        object3.setSize(new Vector2D(40,40));
+        object3.setLocation(new Vector2D(-200,-44));
+        object3.getHitBoxes().add(new Rectangle2D.Float(0,0,40,40));
+        worldMap.addInteractable(object3);
         worldMap.addInteractable(object);
+        worldMap.addInteractable(object2);
         this.yourPlayer = p;
         this.worldMap.getISessionManager().addInteractable(p);
 

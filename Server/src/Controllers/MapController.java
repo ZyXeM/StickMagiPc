@@ -142,7 +142,6 @@ public class MapController extends Thread implements IMapController {
 
                 Iterator<PackageBundle> it = this.packetQ.iterator();
                 while (it.hasNext()) {
-                    System.out.println("Messages");
                     PackageBundle pk = it.next();
                     this.handlePacket(pk);
                     it.remove();

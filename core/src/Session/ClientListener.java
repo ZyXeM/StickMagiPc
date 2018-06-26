@@ -28,7 +28,6 @@ public class ClientListener extends Thread {
         while (true) {
 
             try {
-                System.out.println("receiving");
                 InetSocketAddress i = new InetSocketAddress(hostIP,port);
                 DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length, i.getAddress(), port);
                 datagramSocket.receive(receivePacket);
